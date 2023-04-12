@@ -1,0 +1,37 @@
+name: Validate Pulumi
+
+on:
+  push:
+    branches:
+      - 'main'
+  pull_request:
+    branches:
+      - 'main'
+
+concurrency:
+  group: ${{ format('{0}-{1}', github.job, github.ref) }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Lint the source
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Validate Pulumi
+        run: |
+          docker run -rm \
+          -e PULUMI_BACKEND_URL=${{ secrets.PULUMI_BACKEND_URL }} \
+          -e PULUMI_CONFIG_PASSPHRASE=${{ secrets.PULUMI_CONFIG_PASSPHRASE }} \
+          -e AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} \
+          -e AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} \
+          -e AWS_REGION=us-east-2 \
+          -w /app \
+          -v $(pwd):/app \
+          --entrypoint bash \
+          pulumi/pulumi:latest \
+          -c "find . -name 'Pulumi.yaml' -printf '%h\n' | sort -u | xargs -I '{}' bash -c 'pushd {} && pulumi preview --non-interactive && popd'"

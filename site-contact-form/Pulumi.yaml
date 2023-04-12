@@ -1,0 +1,85 @@
+name: SPS Site Contact Form Lambda
+runtime: yaml
+description: SPS contact form lambda
+
+variables:
+  bucket-name: ${lambda-code-stack.outputs["bucket-name"]}
+  sender-email: ${ses-identity-stack.outputs["sender-email"]}
+
+resources:
+  lambda-code-stack:
+    type: pulumi:pulumi:StackReference
+    properties:
+      name: sps-source-code-bucket
+
+  ses-identity-stack:
+    type: pulumi:pulumi:StackReference
+    properties:
+      name: sps-ses-identity
+
+  secret:
+    type: aws:secretsmanager:Secret
+    properties:
+      name: sps-contact-form-secret
+
+  lambda-role:
+    type: aws:iam:Role
+    properties:
+      assumeRolePolicy:
+        fn::toJSON:
+          Version: 2012-10-17
+          Statement:
+            - Action: sts:AssumeRole
+              Effect: Allow
+              Principal:
+                Service: lambda.amazonaws.com
+      inlinePolicies:
+        - name: contact_form_lambda_role
+          policy:
+            fn::toJSON:
+              Version: 2012-10-17
+              Statement:
+                - Action: ses:SendEmail
+                  Effect: Allow
+                  Resource: 'arn:aws:ses:*:326785923695:identity/*'
+                - Action: secretsmanager:GetSecretValue
+                  Effect: Allow
+                  Resource: 'arn:aws:secretsmanager:us-east-2:326785923695:secret:*'
+
+  lambda:
+    type: aws:lambda:Function
+    properties:
+      name: sps-contact-form-lambda
+      role: ${lambda-role.arn}
+      s3Bucket: ${bucket-name}
+      s3Key: sps-contact-form.zip
+      runtime: python3.9
+      environment:
+        variables:
+          SES_IDENTITY: ${sender-email}
+          SECRET_NAME: ${secret.id}
+      handler: app.lambda_function
+    options:
+      deleteBeforeReplace: true
+
+  api-gateway:
+    type: aws:apigatewayv2:Api
+    properties:
+      name: sps-contact-form-gateway
+      protocolType: HTTP
+      corsConfiguration:
+        allowOrigins:
+        - https://snowypeaksystems.com
+      routeKey: POST /contact
+      target: ${lambda.arn}
+
+  lambdaPermission:
+    type: aws:lambda:Permission
+    properties:
+      statementId: contact-form-lambda-policy
+      action: lambda:InvokeFunction
+      function: sps-contact-form-lambda
+      principal: apigateway.amazonaws.com
+      # The /* part allows invocation from any stage, method and resource path
+      #     // within API Gateway.
+      sourceArn: ${api-gateway.executionArn}/*

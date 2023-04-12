@@ -1,0 +1,12 @@
+name: SPS Sender Identity
+runtime: yaml
+description: Bucket to store contact form lambda code
+
+resources:
+  sender-email:
+    type: aws:sesv2:EmailIdentity
+    properties:
+      emailIdentity: levi.muniz17@gmail.com
+
+outputs:
+  sender-email: ${sender-email.id}

@@ -1,0 +1,22 @@
+name: SPS Lambda Source Bucket
+runtime: yaml
+description: Bucket to store lambda code
+
+resources:
+  # Create lambda source code bucket
+  lambda-bucket:
+    type: aws:s3:BucketV2
+    properties:
+      bucket: sps-lambda-code-9cc619ae-565f-5f25-b150-57abb4c4cbac
+
+  block-access:
+    type: aws:s3:BucketPublicAccessBlock
+    properties:
+      bucket: ${lambda-bucket.id}
+      blockPublicAcls: true
+      blockPublicPolicy: true
+      ignorePublicAcls: true
+      restrictPublicBuckets: true
+
+outputs:
+  bucket-name: ${lambda-bucket.id}
