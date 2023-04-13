@@ -34,4 +34,4 @@ jobs:
           -v $(pwd):/app \
           --entrypoint bash \
           --rm pulumi/pulumi:latest \
-          -c "find . -name 'Pulumi.yaml' -printf '%h\n' | sort -u | xargs -I '{}' bash -c 'pushd {} && pulumi preview --non-interactive && popd'"
+          -c "python .utils/validator/validate.py"
