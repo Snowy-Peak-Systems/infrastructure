@@ -1,6 +1,7 @@
 import os
 import re
 import subprocess
+import sys
 from typing import List
 
 MATCH_PATTERN = re.compile("Pulumi\\.(.*)\\.yaml")
@@ -42,8 +43,16 @@ def run_command(args: List[str], work_dir: str) -> None:
 
 def main():
     projects = get_directory_list(os.getcwd())
-    for p in projects:
-        run_command(["pulumi", "preview", "--non-interactive", "-s", get_stack_name(p)], p)
+
+    try:
+        for p in projects:
+            print(f"Validating project at {p}")
+            run_command(["pulumi", "preview", "--non-interactive", "-s", get_stack_name(p)], p)
+    except:
+        print("Validation failed!")
+        sys.exit(1)
+
+    print("Validation completed successfully!")
 
 
 if __name__ == '__main__':
