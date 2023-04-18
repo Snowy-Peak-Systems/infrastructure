@@ -3,8 +3,7 @@ import re
 import subprocess
 from typing import List
 
-
-MATCH_PATTERN = re.compile("Pulumi\.(.*)\.yaml")
+MATCH_PATTERN = re.compile("Pulumi\\.(.*)\\.yaml")
 
 
 def get_directory_list(path: str) -> List[str]:
