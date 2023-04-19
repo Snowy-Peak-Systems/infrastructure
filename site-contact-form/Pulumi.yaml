@@ -82,6 +82,7 @@ resources:
       #     // within API Gateway.
       sourceArn: ${api-gateway.executionArn}/*
 
+
   gateway-integration:
     type: aws:apigatewayv2:Integration
     properties:
