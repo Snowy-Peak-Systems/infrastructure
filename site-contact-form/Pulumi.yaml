@@ -70,8 +70,6 @@ resources:
       corsConfiguration:
         allowOrigins:
         - https://snowypeaksystems.com
-      routeKey: POST /contact
-      target: ${lambda.arn}
 
   lambdaPermission:
     type: aws:lambda:Permission
@@ -83,3 +81,39 @@ resources:
       # The /* part allows invocation from any stage, method and resource path
       #     // within API Gateway.
       sourceArn: ${api-gateway.executionArn}/*
+
+  gateway-integration:
+    type: aws:apigatewayv2:Integration
+    properties:
+      apiId: ${api-gateway.id}
+      integrationType: AWS_PROXY
+      description: Contact form integration
+      integrationMethod: POST
+      integrationUri: ${lambda.invokeArn}
+      payloadFormatVersion: "2.0"
+
+
+  gateway-route:
+    type: aws:apigatewayv2:Route
+    properties:
+      apiId: ${api-gateway.id}
+      routeKey: POST /contact
+      target: integrations/${gateway-integration.id}
+    options:
+      dependsOn:
+      - ${gateway-integration}
+
+
+  gateway-stage:
+    type: aws:apigatewayv2:Stage
+    properties:
+      apiId: ${api-gateway.id}
+      autoDeploy: true
+      name: $default
+      routeSettings:
+        - routeKey: POST /contact
+          throttlingBurstLimit: 2
+          throttlingRateLimit: 2
+    options:
+      dependsOn:
+      - ${gateway-route}
