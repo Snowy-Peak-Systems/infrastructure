@@ -1,6 +1,6 @@
 name: SPS Sender Identity
 runtime: yaml
-description: Bucket to store contact form lambda code
+description: Email identity to send emails as
 
 resources:
   sender-email:
