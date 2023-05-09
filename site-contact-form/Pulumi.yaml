@@ -67,7 +67,6 @@ resources:
         variables:
           SES_IDENTITY: ${sender-email}
           SECRET_NAME: ${secret.id}
-          SKIP_CAPTCHA: "true"
       handler: app.lambda_function
     options:
       deleteBeforeReplace: true
