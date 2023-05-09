@@ -86,7 +86,7 @@ resources:
     properties:
       statementId: contact-form-lambda-policy
       action: lambda:InvokeFunction
-      function: sps-contact-form-lambda
+      function: ${lambda.name}
       principal: apigateway.amazonaws.com
       # The /* part allows invocation from any stage, method and resource path
       #     // within API Gateway.
