@@ -45,6 +45,15 @@ resources:
                 - Action: secretsmanager:GetSecretValue
                   Effect: Allow
                   Resource: 'arn:aws:secretsmanager:us-east-2:326785923695:secret:*'
+                - Action: logs:CreateLogGroup
+                  Effect: Allow
+                  Resource: "arn:aws:logs:*:*:*"
+                - Action: logs:CreateLogStream
+                  Effect: Allow
+                  Resource: "arn:aws:logs:*:*:*"
+                - Action: logs:PutLogEvents
+                  Effect: Allow
+                  Resource: "arn:aws:logs:*:*:*"
 
   lambda:
     type: aws:lambda:Function
@@ -104,10 +113,32 @@ resources:
       dependsOn:
       - ${gateway-integration}
 
+  api-gateway-log-group:
+    type: aws:cloudwatch:LogGroup
+    properties:
+      name: sps-contact-form-api-gateway
+      retentionInDays: 30
 
   gateway-stage:
     type: aws:apigatewayv2:Stage
     properties:
+      accessLogSettings:
+        destinationArn: ${api-gateway-log-group.arn}
+        format: >
+          {
+          "requestId":"$context.requestId",
+          "extendedRequestId":"$context.extendedRequestId",
+          "ip": "$context.identity.sourceIp",
+          "caller":"$context.identity.caller",
+          "user":"$context.identity.user",
+          "requestTime":"$context.requestTime",
+          "httpMethod":"$context.httpMethod",
+          "resourcePath":"$context.resourcePath",
+          "status":"$context.status",
+          "protocol":"$context.protocol",
+          "responseLength":"$context.responseLength"
+          }
+
       apiId: ${api-gateway.id}
       autoDeploy: true
       name: $default

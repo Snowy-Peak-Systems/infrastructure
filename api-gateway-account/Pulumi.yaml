@@ -1,0 +1,48 @@
+name: SPS API Gateway Account
+runtime: yaml
+description: Account and settings for API Gateway
+
+resources:
+  cloudwatch-role:
+    type: aws:iam:Role
+    properties:
+      assumeRolePolicy:
+        fn::toJSON:
+          Version: 2012-10-17
+          Statement:
+            - Action: sts:AssumeRole
+              Effect: Allow
+              Principal:
+                Service: apigateway.amazonaws.com
+      inlinePolicies:
+        - name: contact_form_lambda_role
+          policy:
+            fn::toJSON:
+              Version: 2012-10-17
+              Statement:
+                - Action: logs:CreateLogGroup
+                  Effect: Allow
+                  Resource: '*'
+                - Action: logs:CreateLogStream
+                  Effect: Allow
+                  Resource: '*'
+                - Action: logs:DescribeLogGroups
+                  Effect: Allow
+                  Resource: '*'
+                - Action: logs:DescribeLogStreams
+                  Effect: Allow
+                  Resource: '*'
+                - Action: logs:PutLogEvents
+                  Effect: Allow
+                  Resource: '*'
+                - Action: logs:GetLogEvents
+                  Effect: Allow
+                  Resource: '*'
+                - Action: logs:FilterLogEvents
+                  Effect: Allow
+                  Resource: '*'
+
+  gateway-account:
+    type: aws:apigateway:Account
+    properties:
+      cloudwatchRoleArn: ${cloudwatch-role.arn}
