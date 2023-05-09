@@ -81,7 +81,7 @@ resources:
         allowOrigins:
         - https://snowypeaksystems.com
 
-  lambdaPermission:
+  lambda-permission:
     type: aws:lambda:Permission
     properties:
       statementId: contact-form-lambda-policy
