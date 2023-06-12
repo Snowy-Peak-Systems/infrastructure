@@ -79,6 +79,16 @@ resources:
       corsConfiguration:
         allowOrigins:
         - https://snowypeaksystems.com
+        allowMethods:
+        - POST
+        allowHeaders:
+        - Content-Type
+        - X-Amz-Date
+        - Authorization
+        - X-Api-Key
+        - X-Amz-Security-Token
+        - X-Amz-User-Agent
+        - X-Amzn-Trace-Id
 
   lambda-permission:
     type: aws:lambda:Permission
