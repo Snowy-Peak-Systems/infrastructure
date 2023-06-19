@@ -1,0 +1,23 @@
+name: SPS Public Bucket
+runtime: yaml
+description: Bucket to store publicly accessible files
+
+resources:
+  public-bucket:
+    type: aws:s3:Bucket
+    properties:
+      arn: arn:aws:s3:::sps-public-bucket-1877fa47-0346-46c8-9bd7-d13e460be75b
+      bucket: sps-public-bucket-1877fa47-0346-46c8-9bd7-d13e460be75b
+      hostedZoneId: Z2O1EMRO9K5GLX
+      requestPayer: BucketOwner
+      serverSideEncryptionConfiguration:
+        rule:
+          applyServerSideEncryptionByDefault:
+            sseAlgorithm: AES256
+          bucketKeyEnabled: true
+
+  public-access-policy:
+    type: aws:s3:BucketPolicy
+    properties:
+      bucket: sps-public-bucket-1877fa47-0346-46c8-9bd7-d13e460be75b
+      policy: '{"Statement":[{"Action":"s3:GetObject","Effect":"Allow","Principal":"*","Resource":"arn:aws:s3:::sps-public-bucket-1877fa47-0346-46c8-9bd7-d13e460be75b/*"}],"Version":"2012-10-17"}'
