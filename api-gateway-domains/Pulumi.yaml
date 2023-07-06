@@ -1,0 +1,25 @@
+name: SPS API Gateway Domains
+runtime: yaml
+description: API Gateway Custom Domains
+
+resources:
+  aws-acm-cert:
+    type: aws:acm:Certificate
+    properties:
+      domainName: contact.api.snowypeaksystems.com
+      validationMethod: DNS
+
+  contact-api-domain:
+    type: aws:apigatewayv2:DomainName
+    properties:
+      domainName: ${aws-acm-cert.domainName}
+      domainNameConfiguration:
+        certificateArn: ${aws-acm-cert.arn}
+        endpointType: REGIONAL
+        securityPolicy: TLS_1_2
+
+outputs:
+  contact-api-domain-name: ${contact-api-domain.domainName}
+  contact-api-domain-id: ${contact-api-domain.id}
+  contact-api-domain-target: ${contact-api-domain.domainNameConfiguration.targetDomainName}
+  contact-api-domain-zone: ${contact-api-domain.domainNameConfiguration.hostedZoneId}

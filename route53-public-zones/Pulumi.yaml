@@ -2,6 +2,11 @@ name: Route53 Public Zones
 runtime: yaml
 description: Public zones for DNS records
 
+variables:
+  contact-api-domain-name: ${api-gateway-domain-stack.outputs["contact-api-domain-name"]}
+  contact-api-domain-target: ${api-gateway-domain-stack.outputs["contact-api-domain-target"]}
+  contact-api-domain-zone: ${api-gateway-domain-stack.outputs["contact-api-domain-zone"]}
+
 resources:
   public-zone:
     type: aws:route53:Zone
@@ -41,6 +46,22 @@ resources:
       ttl: 3600
       type: A
       zoneId: ${public-zone.zoneId}
+
+  api-gateway-domain-stack:
+    type: pulumi:pulumi:StackReference
+    properties:
+      name: api-gateway-domains
+
+  contact-api:
+    type: aws:route53:Record
+    properties:
+      name: ${contact-api-domain-name}
+      type: A
+      zoneId: ${public-zone.zoneId}
+      aliases:
+        - name: ${contact-api-domain-target}
+          zoneId: ${contact-api-domain-zone}
+          evaluateTargetHealth: false
 
   aws-east-1:
     type: pulumi:providers:aws

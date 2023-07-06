@@ -5,6 +5,7 @@ description: SPS contact form lambda
 variables:
   bucket-name: ${lambda-code-stack.outputs["bucket-name"]}
   sender-email: ${ses-identity-stack.outputs["sender-email"]}
+  api-domain-id: ${api-gateway-domain-stack.outputs["contact-api-domain-id"]}
 
 resources:
   lambda-code-stack:
@@ -111,7 +112,6 @@ resources:
       integrationUri: ${lambda.invokeArn}
       payloadFormatVersion: "2.0"
 
-
   gateway-route:
     type: aws:apigatewayv2:Route
     properties:
@@ -157,3 +157,15 @@ resources:
     options:
       dependsOn:
       - ${gateway-route}
+
+  api-gateway-domain-stack:
+    type: pulumi:pulumi:StackReference
+    properties:
+      name: api-gateway-domains
+
+  api-mapping:
+    type: aws:apigatewayv2:ApiMapping
+    properties:
+      apiId: ${api-gateway.id}
+      domainName: ${api-domain-id}
+      stage: ${gateway-stage.id}
