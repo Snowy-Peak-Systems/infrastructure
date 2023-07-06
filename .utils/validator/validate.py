@@ -37,8 +37,10 @@ def get_stack_name(path: str) -> str:
 
 
 def run_command(args: List[str], work_dir: str) -> None:
+    sys.stdout.flush()
     if subprocess.run(args, cwd=work_dir).returncode != 0:
         raise Exception("Validation failed!")
+    sys.stdout.flush()
 
 
 def main():
