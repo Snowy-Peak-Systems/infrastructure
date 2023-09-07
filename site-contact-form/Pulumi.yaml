@@ -63,7 +63,7 @@ resources:
       role: ${lambda-role.arn}
       s3Bucket: ${bucket-name}
       s3Key: sps-contact-form.zip
-      runtime: python3.9
+      runtime: python3.10
       environment:
         variables:
           SES_IDENTITY: ${sender-email}
