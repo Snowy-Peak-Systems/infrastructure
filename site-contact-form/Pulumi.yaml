@@ -63,7 +63,7 @@ resources:
       role: ${lambda-role.arn}
       s3Bucket: ${bucket-name}
       s3Key: sps-contact-form.zip
-      runtime: python3.10
+      runtime: python3.11
       environment:
         variables:
           SES_IDENTITY: ${sender-email}
@@ -71,6 +71,7 @@ resources:
       handler: app.lambda_function
     options:
       deleteBeforeReplace: true
+      version: 6.0.4
 
   api-gateway:
     type: aws:apigatewayv2:Api
