@@ -27,6 +27,16 @@ resources:
       type: A
       zoneId: ${public-zone.zoneId}
 
+  search-console-verify:
+    type: aws:route53:Record
+    properties:
+      name: snowypeaksystems.com
+      records:
+        - google-site-verification=Sd3Qqt4m5bkyGhcMe8VKg_SiL4yzrKDLF5J2q0cn5jA
+      ttl: 3600
+      type: TXT
+      zoneId: ${public-zone.zoneId}
+
   www-record-cname:
     type: aws:route53:Record
     properties:
